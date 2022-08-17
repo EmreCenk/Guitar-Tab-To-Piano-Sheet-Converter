@@ -1,6 +1,6 @@
 
 from typing import *
-# from parsing_svg.MusicAbstractions import Note, Bar
+# from src.MusicAbstractions import Note, Bar
 
 
 class Command:
@@ -84,7 +84,7 @@ class PathCommandParser:
         Converts a path command to a list of beats.
         :param command: The command to parse
         :return: A list of beats showing how long each note should last
-        Note: look at Note class in parsing_svg/MusicAbstractions.py to see which beat length maps to which integer
+        Note: look at Note class in src/MusicAbstractions.py to see which beat length maps to which integer
         """
 
         commands = self.convert_string_to_command_list(command)
