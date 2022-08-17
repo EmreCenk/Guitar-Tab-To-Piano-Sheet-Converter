@@ -123,7 +123,7 @@ class PathCommandParser:
             for h0, h1 in horizontals:
                 if h0 <= verticals[i] <= h1:
                     number_of_intersections[verticals[i]] += 1
-
+        print(number_of_intersections)
         lengths = []
         for k in sorted(number_of_intersections):
             lengths.append(1/2**number_of_intersections[k])
@@ -133,9 +133,10 @@ class PathCommandParser:
 if __name__ == '__main__':
     # example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
+    e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     s = PathCommandParser()
     print(
-        s.path_command_to_beats(example_path_command)
+        s.path_command_to_beats(e2)
     )
 
 
