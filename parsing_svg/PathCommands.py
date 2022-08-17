@@ -16,6 +16,7 @@ class Command:
 
         elif len(command) > 1:
             self.inputs.append(int(command[1:]))
+
     def __str__(self):
         w = self.command_letter
         if len(self.inputs) == 0: return w + ": ()"
@@ -32,7 +33,7 @@ class PathCommandParser:
         self.y = 0
 
 
-    def parse_commands(self, command: str) -> List[Command]:
+    def convert_string_to_command_list(self, command: str) -> List[Command]:
         """
         :param command: command to parse
         :return: List of parsed commands
@@ -50,9 +51,34 @@ class PathCommandParser:
             commands.append(current_command)
 
             command = command[command_stopping_index:]
-        if len(command) == 1: commands.append(command)
+        if len(command) == 1: commands.append(Command(command))
 
         return commands
+
+
+    def execute_command(self, command: Command):
+        """
+        Parses a command and moves the self.x and self.y variables accordingly
+        :param command:
+        :return:
+        """
+        if command.command_letter == "M":
+            self.x = command.inputs[0]
+            self.y = command.inputs[1]
+        elif command.command_letter == "m":
+            self.x += command.inputs[0]
+            self.y += command.inputs[1]
+
+
+        elif command.command_letter == "V":
+            self.y = command.inputs[0]
+        elif command.command_letter == "v":
+            self.y += command.inputs[0]
+
+        elif command.command_letter == "H":
+            self.x = command.inputs[0]
+        elif command.command_letter == "h":
+            self.x += command.inputs[0]
     def path_command_to_beats(self, command: str) -> List[int]:
         """
         Converts a path command to a list of beats.
@@ -60,13 +86,13 @@ class PathCommandParser:
         :return: A list of beats showing how long each note should last
         Note: look at Note class in parsing_svg/MusicAbstractions.py to see which beat length maps to which integer
         """
-        coms = self.parse_commands(command)
-        for c in coms: print(c)
+
+        commands = self.convert_string_to_command_list(command)
+        for c in commands: print(c)
         verticals = [] # a list of y coordinates where there are vertical lines
         horizontals = [] # A list of x intervals showing where the horizontal lines are
 
-        # for i in range(len(coms)):
-        #     if coms[i][0] == "v":
+
 
 
 if __name__ == '__main__':
