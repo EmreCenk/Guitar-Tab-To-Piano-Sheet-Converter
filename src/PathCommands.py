@@ -1,4 +1,5 @@
 
+from collections import defaultdict
 from typing import *
 # from src.MusicAbstractions import Note, Bar
 
@@ -79,6 +80,30 @@ class PathCommandParser:
             self.x = command.inputs[0]
         elif command.command_letter == "h":
             self.x += command.inputs[0]
+
+    def get_vertical_and_horizontal_lines(self, commands: List[Command]) -> Tuple[List[int], List[Tuple[int, int]]]:
+        """
+        :param commands:
+        :return: [x coordinates of vertical lines, x intervals of horizontal lines]
+        """
+        verticals = [] # a list of x coordinates where there are vertical lines
+        horizontals = [] # A list of x intervals showing where the horizontal lines are
+
+        for i in range(len(commands)):
+            if commands[i].command_letter.lower() == "v":
+                if commands[i].inputs[0] == 18:
+                # if commands[i-1].command_letter == "M":
+                    verticals.append(self.x) # y coordinate of where we last moved
+                # else:
+                #     print("ew", commands[i].inputs[0], self.x)
+
+            elif commands[i].command_letter == "h":
+                horizontals.append(tuple(sorted((self.x, self.x + commands[i].inputs[0]))))
+
+            elif commands[i].command_letter == "H":
+                horizontals.append(tuple(sorted((self.x, commands[i].inputs[0]))))
+            self.execute_command(commands[i])
+        return verticals, horizontals
     def path_command_to_beats(self, command: str) -> List[int]:
         """
         Converts a path command to a list of beats.
@@ -89,27 +114,19 @@ class PathCommandParser:
 
         commands = self.convert_string_to_command_list(command)
         for c in commands: print(c)
-        verticals = [] # a list of y coordinates where there are vertical lines
-        horizontals = [] # A list of x intervals showing where the horizontal lines are
+        verticals, horizontals = self.get_vertical_and_horizontal_lines(commands)
 
-        for i in range(len(commands)):
-            print(commands[i], type(commands[i]))
-            if commands[i].command_letter.lower() == "v":
-                verticals.append(self.y) # y coordinate of where we last moved
-
-            elif commands[i].command_letter == "h":
-                horizontals.append((self.x, self.x + commands[i].inputs[0]))
-
-            elif commands[i].command_letter == "H":
-                horizontals.append((self.x, commands[i].inputs[0]))
-            self.execute_command(commands[i])
-
-        print(verticals)
-        print(horizontals)
-
+        number_of_intersections = {v: 0 for v in verticals}
+        print(sorted(set(verticals)), horizontals)
+        #finding the number of times each vertical line intersects with a horizontal line:
+        for i in range(len(verticals)):
+            for h0, h1 in horizontals:
+                if h0 <= verticals[i] <= h1:
+                    number_of_intersections[verticals[i]] += 1
+        return number_of_intersections
 
 if __name__ == '__main__':
-    example_path_command = """M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"""
+    example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     # example_path_command = "M106,74"
     s = PathCommandParser()
     print(
