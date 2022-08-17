@@ -92,7 +92,20 @@ class PathCommandParser:
         verticals = [] # a list of y coordinates where there are vertical lines
         horizontals = [] # A list of x intervals showing where the horizontal lines are
 
+        for i in range(len(commands)):
+            print(commands[i], type(commands[i]))
+            if commands[i].command_letter.lower() == "v":
+                verticals.append(self.y) # y coordinate of where we last moved
 
+            elif commands[i].command_letter == "h":
+                horizontals.append((self.x, self.x + commands[i].inputs[0]))
+
+            elif commands[i].command_letter == "H":
+                horizontals.append((self.x, commands[i].inputs[0]))
+            self.execute_command(commands[i])
+
+        print(verticals)
+        print(horizontals)
 
 
 if __name__ == '__main__':
