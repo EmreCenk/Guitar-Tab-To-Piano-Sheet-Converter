@@ -32,9 +32,24 @@ class SongScraper:
 
         self.browser.maximize_window()
 
-    def get_bars(self):
+    def parse_line(self, line):
+        notes = line.find_elements(By.TAG_NAME, "text")
+        for n in notes:
+            if n.text in {"E", "B", "G", "D", "A"}: continue
+            y = float(n.get_attribute("y"))
+            if y < 0: continue
+            string_index = y/12
+            if string_index != int(string_index): continue
+            fret_number = int(n.text)
+            print(string_index, fret_number)
+    def get_bars(self, song_url: str):
         LINE_CLASS_NAME = "Cw81bf" # container for each line, usually has 3 bars inside
+        self.browser.get(song_url)
+        self.wait_for_page()
 
+        lines = self.browser.find_elements(By.CLASS_NAME, LINE_CLASS_NAME)
+        for line in lines:
+            self.parse_line(line)
     def wait_for_page(self):
         page_main = self.browser.find_elements(By.CSS_SELECTOR, "html")
         started = perf_counter()
