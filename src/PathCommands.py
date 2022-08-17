@@ -1,7 +1,7 @@
 
 from collections import defaultdict
 from typing import *
-# from src.MusicAbstractions import Note, Bar
+from src.MusicAbstractions import Note, Bar
 
 
 class Command:
@@ -117,17 +117,22 @@ class PathCommandParser:
         verticals, horizontals = self.get_vertical_and_horizontal_lines(commands)
 
         number_of_intersections = {v: 0 for v in verticals}
-        print(sorted(set(verticals)), horizontals)
+        # print(sorted(set(verticals)), horizontals)
         #finding the number of times each vertical line intersects with a horizontal line:
         for i in range(len(verticals)):
             for h0, h1 in horizontals:
                 if h0 <= verticals[i] <= h1:
                     number_of_intersections[verticals[i]] += 1
-        return number_of_intersections
+
+        lengths = []
+        for k in sorted(number_of_intersections):
+            lengths.append(1/2**number_of_intersections[k])
+
+        return lengths
 
 if __name__ == '__main__':
-    example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
-    # example_path_command = "M106,74"
+    # example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
+    example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
     s = PathCommandParser()
     print(
         s.path_command_to_beats(example_path_command)
