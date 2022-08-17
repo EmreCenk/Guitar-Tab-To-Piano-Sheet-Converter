@@ -16,18 +16,19 @@ class PathCommandParser:
         :return: A list of beats showing how long each note should last
         Note: look at Note class in parsing_svg/MusicAbstractions.py to see which beat length maps to which integer
         """
-        if len(command) == 0: return None
-        command_stopping_index = None
+        commands = []
 
-        for i in range(1, len(command)):
-            if command[i] in self.commands:
-                command_stopping_index = i
-                break
+        while len(command) > 1:
+            command_stopping_index = 0
+            for i in range(1, len(command)):
+                if command[i] in self.commands:
+                    command_stopping_index = i
+                    break
+            commands.append(command[:command_stopping_index])
+            command = command[command_stopping_index:]
+        if len(command) == 1: commands.append(command)
+        print(commands)
 
-        if command_stopping_index is None: return ""
-        print(command[:command_stopping_index])
-        print(self.path_command_to_beats(command[command_stopping_index:]))
-        return ""
 if __name__ == '__main__':
     example_path_command = """M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"""
     # example_path_command = "M106,74"
@@ -35,3 +36,5 @@ if __name__ == '__main__':
     print(
         s.path_command_to_beats(example_path_command)
     )
+
+
