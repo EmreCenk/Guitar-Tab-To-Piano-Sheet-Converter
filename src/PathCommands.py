@@ -106,7 +106,7 @@ class PathCommandParser:
         return verticals, horizontals
     def path_command_to_beats(self, command: str) -> List[int]:
         """
-        Converts a path command to a list of beats.
+        Converts a path command to a list of beat lengths.
         :param command: The command to parse
         :return: A list of beats showing how long each note should last
         Note: look at Note class in src/MusicAbstractions.py to see which beat length maps to which integer
