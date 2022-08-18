@@ -4,6 +4,8 @@
 from selenium import webdriver
 from time import perf_counter
 from selenium.webdriver.common.by import By
+from src.MusicAbstractions import GuitarTabNote, PianoNote, Piece, Bar
+from typing import *
 
 class SongScraper:
 
@@ -32,24 +34,33 @@ class SongScraper:
 
         self.browser.maximize_window()
 
-    def parse_line(self, line):
+    def parse_line(self, line) -> Bar:
         notes = line.find_elements(By.TAG_NAME, "text")
+        piano_notes = []
         for n in notes:
             if n.text in {"E", "B", "G", "D", "A"}: continue
             y = float(n.get_attribute("y"))
             if y < 0: continue
             string_index = y/12
             if string_index != int(string_index): continue
+            string_index = int(string_index)
             fret_number = int(n.text)
-            print(string_index, fret_number)
-    def get_bars(self, song_url: str):
+            #todo: parse timings here as well (the parsing is already written, just not plugged in to this section of code)
+            # print(string_index, fret_number)
+            piano_notes.append(GuitarTabNote(0, fret_number, string_index).convert_to_piano_note())
+
+        return Bar(piano_notes)
+    def get_piece(self, song_url: str) -> Piece:
         LINE_CLASS_NAME = "Cw81bf" # container for each line, usually has 3 bars inside
         self.browser.get(song_url)
         self.wait_for_page()
 
         lines = self.browser.find_elements(By.CLASS_NAME, LINE_CLASS_NAME)
+        bars = []
         for line in lines:
-            self.parse_line(line)
+            bars.append(self.parse_line(line))
+        return Piece(bars)
+
     def wait_for_page(self):
         page_main = self.browser.find_elements(By.CSS_SELECTOR, "html")
         started = perf_counter()
