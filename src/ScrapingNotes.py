@@ -97,10 +97,19 @@ class SongScraper:
         print(f"got this lines, this many in fact: {len(lines)}")
 
         bars = []
-        for i in range(len(lines)):
+        W = len(lines)
+        print("new W (first):", W)
+        i = 0
+        while i < W:
+
+        # for i in range(len(lines)):
             print("on line", i)
             current_bar = self.parse_line(lines[i])
             bars.append(current_bar)
+            i += 1
+            lines = self.browser.find_elements(By.CLASS_NAME, LINE_CLASS_NAME)
+            W = len(lines)
+            print("new W:", W)
             print("\n\n")
         return Piece(bars)
 
