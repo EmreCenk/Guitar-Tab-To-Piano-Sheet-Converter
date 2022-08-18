@@ -113,7 +113,7 @@ class PathCommandParser:
         """
 
         commands = self.convert_string_to_command_list(command)
-        for c in commands: print(c)
+        # for c in commands: print(c)
         verticals, horizontals = self.get_vertical_and_horizontal_lines(commands)
 
         number_of_intersections = {v: 0 for v in verticals}
@@ -123,10 +123,11 @@ class PathCommandParser:
             for h0, h1 in horizontals:
                 if h0 <= verticals[i] <= h1:
                     number_of_intersections[verticals[i]] += 1
-        print(number_of_intersections)
+        # print(number_of_intersections)
         lengths = []
         for k in sorted(number_of_intersections):
             lengths.append(1/2**number_of_intersections[k])
+            # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
 
         return lengths
 

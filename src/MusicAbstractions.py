@@ -32,6 +32,8 @@ class GuitarTabNote:
 
         # Used the following image to see how guitar strings convert to piano: https://www.get-tuned.com/images/tune-w-paino.png
         guitar_string_index_to_piano_key = { #maps fret number to which number key on the piano
+            #source: https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
+            #note: to convert to midi, just add 20 to the piano key number
             5: 5 + 15,
             4: 10 + 15,
             3: 15 + 15,
@@ -39,6 +41,7 @@ class GuitarTabNote:
             1: 24 + 15,
             0: 29 + 15, #middle E
         }
+
 
 
         return PianoNote(self.beat_length, guitar_string_index_to_piano_key[self.string_index] + self.fret_number)
