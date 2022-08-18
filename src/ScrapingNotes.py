@@ -86,7 +86,7 @@ class SongScraper:
         print("done equating")
         return piano_bar
 
-    def get_piece(self, song_url: str) -> Piece:
+    def get_piece(self, song_url: str, line_limit: int = 10000) -> Piece:
         LINE_CLASS_NAME = "Cw81bf" # container for each line, usually has 3 bars inside
         self.browser.get(song_url)
         self.wait_for_page()
@@ -100,7 +100,7 @@ class SongScraper:
         W = len(lines)
         print("new W (first):", W)
         i = 0
-        while i < W:
+        while i < W and i < line_limit:
 
         # for i in range(len(lines)):
             print("on line", i)
@@ -131,4 +131,4 @@ if __name__ == '__main__':
 
     url = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
     self = SongScraper()
-    p = self.get_piece(url)
+    p = self.get_piece(url, line_limit = 12) #get first 8 lines
