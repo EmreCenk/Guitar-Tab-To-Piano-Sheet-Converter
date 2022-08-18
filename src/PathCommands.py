@@ -1,7 +1,7 @@
 
 from collections import defaultdict
 from typing import *
-from src.MusicAbstractions import Note, Bar
+from src.MusicAbstractions import PianoNote, Bar
 
 
 class Command:

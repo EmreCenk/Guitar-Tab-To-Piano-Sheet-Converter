@@ -1,6 +1,6 @@
 from typing import *
 
-class Note:
+class PianoNote:
     def __init__(self, beat_length: int, note: int):
         """
         :param beat_length: How long the note lasts for
@@ -18,8 +18,33 @@ class Note:
         self.beat_length = beat_length
         self.note = note
 
+class GuitarTabNote:
+    def __init__(self, beat_length: int, guitar_fret_number: int, guitar_string_index: int):
+        self.beat_length = beat_length
+        self.fret_number = guitar_fret_number
+        self.string_index = guitar_string_index
+
+    def convert_to_piano_note(self) -> PianoNote:
+        """
+        Returns a PianoNote object where the note is a number from 0-87 (for which key should be played)
+        :return: PianoNote
+        """
+
+        # Used the following image to see how guitar strings convert to piano: https://www.get-tuned.com/images/tune-w-paino.png
+        guitar_string_index_to_piano_key = { #maps fret number to which number key on the piano
+            5: 5 + 15,
+            4: 10 + 15,
+            3: 15 + 15,
+            2: 20 + 15,
+            1: 24 + 15,
+            0: 29 + 15, #middle E
+        }
+
+
+        return PianoNote(self.beat_length, guitar_string_index_to_piano_key[self.string_index] + self.fret_number)
+
 class Bar:
-    def __init__(self, notes: List[Note]):
+    def __init__(self, notes: List[PianoNote]):
         self.notes = notes
 
 class Piece:
