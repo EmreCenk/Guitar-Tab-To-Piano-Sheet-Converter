@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import *
 from src.MusicAbstractions import PianoNote, Bar
 
-
+#TODO: THE DOTS AREN'T DETECTED (BC YOU DID NOT ACCOUNT FOR THEM IN THE CODE LOL)
 class Command:
     def __init__(self, command: str):
         self.command_letter = command[0]
