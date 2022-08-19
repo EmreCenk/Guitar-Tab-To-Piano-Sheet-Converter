@@ -10,14 +10,14 @@ class Command:
         self.command_letter = command[0]
         self.inputs = []
 
-        if "," in command:
-            # there are two inputs as numbers
-            k = command[1:].split(",")
-            self.inputs.append(int(k[0]))
-            self.inputs.append(int(k[1]))
 
-        elif len(command) > 1:
-            self.inputs.append(int(command[1:]))
+        for k in command[1:].split(" "):
+            if len(k) == 0: continue
+            k = k.split(",")
+            for i in range(len(k)):
+                self.inputs.append(int(k[i]))
+
+
 
     def __str__(self):
         w = self.command_letter
@@ -26,6 +26,7 @@ class Command:
         for i in self.inputs: w += str(i) + ", "
         w = w[:-2] + ")"
         return w
+
 
 class PathCommandParser:
 
@@ -44,6 +45,7 @@ class PathCommandParser:
 
         while len(command) > 1:
             command_stopping_index = 0
+            #go until you find a letter
             for i in range(1, len(command)):
                 if command[i] in self.commands:
                     command_stopping_index = i
@@ -149,16 +151,40 @@ class PathCommandParser:
         self.dot_correction(lengths, verticals, horizontals)
         return lengths
 
+class BeatCorrecter():
+
+    """
+    Corrects beats where there is weird notation
+    """
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def correction_accounting_for_different_divisions(correction_command: str, text_in_correction_command: int, already_existing_beat: List[float]) -> List[float]:
+        # correction_command = correction_command.replace(" ", "")
+        temporary_parser = PathCommandParser()
+        commands = temporary_parser.convert_string_to_command_list(correction_command)
+        for com in commands:
+            print(com)
+
+        return already_existing_beat
+
 if __name__ == '__main__':
     # example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     # example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
     # e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     # e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
-    # this one is sus don't worry about it e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
-    s4 = "M316,74v18M352,74v18M316,90v2h36v-2zM388,83v9M462,74v18"
+
+    e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
+    e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
+
+    # s4 = "M316,74v18M352,74v18M316,90v2h36v-2zM388,83v9M462,74v18"
     s = PathCommandParser()
+    parsedinitial = s.path_command_to_beats(e4)
+
     print(
-        s.path_command_to_beats(s4)
+        BeatCorrecter.correction_accounting_for_different_divisions(e4_correction_command, 3, parsedinitial),
     )
 
 
