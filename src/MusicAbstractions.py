@@ -1,5 +1,5 @@
 from typing import *
-
+from src.midi import MIDICreator
 class PianoNote:
     def __init__(self, beat_length: int, note: int):
         """
@@ -51,7 +51,17 @@ class Bar:
         self.notes = notes
 
 class Piece:
-    def __init__(self, bars: List[Bar]):
+    def __init__(self, bars: List[Bar], tempo_bpm: int = 60):
         self.bars = bars
+        self.tempo_bpm = tempo_bpm
         # self.time_signature = ...
         # todo: finding time signature and simplifying it is not as easy as it seems (i'm not even sure if time signature will be usefull at any point in time anyways)
+
+    def convert_to_midi_file(self, file_name_to_save: str):
+        midi = MIDICreator(self.tempo_bpm)
+        current_time = 0
+        for i in range(len(self.bars)):
+            for n in self.bars[i].notes:
+                midi.add_note(n.note + 20, current_time, n.beat_length)
+                current_time += n.beat_length
+        midi.save(file_name_to_save)
