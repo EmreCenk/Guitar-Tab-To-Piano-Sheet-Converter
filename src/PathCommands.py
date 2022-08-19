@@ -6,6 +6,7 @@ from src.MusicAbstractions import PianoNote, Bar
 #TODO: THE DOTS AREN'T DETECTED (BC YOU DID NOT ACCOUNT FOR THEM IN THE CODE LOL)
 class Command:
     def __init__(self, command: str):
+        # print(command, len(command))
         self.command_letter = command[0]
         self.inputs = []
 
@@ -47,10 +48,11 @@ class PathCommandParser:
                 if command[i] in self.commands:
                     command_stopping_index = i
                     break
-
-            current_command = Command(command[:command_stopping_index])
-            commands.append(current_command)
-
+            # print('comstop', command_stopping_index)
+            if command_stopping_index > 0:
+                current_command = Command(command[:command_stopping_index])
+                commands.append(current_command)
+            else: command_stopping_index += 1
             command = command[command_stopping_index:]
         if len(command) == 1: commands.append(Command(command))
 
@@ -93,7 +95,7 @@ class PathCommandParser:
             if commands[i].command_letter.lower() == "v":
                 if commands[i].inputs[0] == 18:
                 # if commands[i-1].command_letter == "M":
-                    verticals.append(self.x) # y coordinate of where we last moved
+                    verticals.append(self.x) # x coordinate of where we last moved
                 # else:
                 #     print("ew", commands[i].inputs[0], self.x)
 
@@ -104,7 +106,23 @@ class PathCommandParser:
                 horizontals.append(tuple(sorted((self.x, commands[i].inputs[0]))))
             self.execute_command(commands[i])
         return verticals, horizontals
-    def path_command_to_beats(self, command: str) -> List[int]:
+
+    def dot_correction(self, lengths: List[float], verticals: List[int], horizontals: List[Tuple[int, int]]) -> List[float]:
+        """
+        Note: mutates the lengths array in place fyi
+        :param lengths: beat lengths obtained from regular line intersection algorithm
+        :param verticals: coordinates of the verticals obtained from regular line intersection algorithm
+        :param horizontals: coordinates of the horizontals obtained from regular line intersection algorithm
+        :return: the lengths array, accounting for the dots that multiply the beat length by 1.5
+        """
+        for h0, h1 in horizontals:
+            length = abs(h1 - h0) #i'm pretty sure h1>h0, but better be safe than sorry with the abs()
+            if length >= 3: continue
+            closest_vertical = min(verticals, key = lambda v: abs(v-h0))
+            lengths[verticals.index(closest_vertical)] *= 1.5
+        return lengths
+
+    def path_command_to_beats(self, command: str) -> List[float]:
         """
         Converts a path command to a list of beat lengths.
         :param command: The command to parse
@@ -128,16 +146,19 @@ class PathCommandParser:
         for k in sorted(number_of_intersections):
             lengths.append(1/2**number_of_intersections[k])
             # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
-
+        self.dot_correction(lengths, verticals, horizontals)
         return lengths
 
 if __name__ == '__main__':
     # example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
-    example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
-    e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
+    # example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
+    # e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
+    # e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
+    # this one is sus don't worry about it e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
+    s4 = "M316,74v18M352,74v18M316,90v2h36v-2zM388,83v9M462,74v18"
     s = PathCommandParser()
     print(
-        s.path_command_to_beats(e2)
+        s.path_command_to_beats(s4)
     )
 
 

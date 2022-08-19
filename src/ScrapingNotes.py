@@ -72,10 +72,11 @@ class SongScraper:
         timings = line.find_elements(By.TAG_NAME, "path")[1:]
         times = []
         for k in timings:
-            print(k.get_attribute("class"))
+            # print(k.get_attribute("class"))
             if k.get_attribute("class") != "Gy73": continue
             path_command = k.get_attribute("d")
             parser = PathCommandParser()
+            # print(path_command)
             beat_lengths = parser.path_command_to_beats(path_command)
             for b in beat_lengths: times.append(b)
 
@@ -147,7 +148,7 @@ if __name__ == '__main__':
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
     # p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
     # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    p1.convert_to_midi_file().save("ye")
+    # p1.convert_to_midi_file().save("ye")
     # convert_multiple_pieces_to_midi([p1, p2, p3], "finfin")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")
