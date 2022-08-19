@@ -57,12 +57,16 @@ class Piece:
         # self.time_signature = ...
         # todo: finding time signature and simplifying it is not as easy as it seems (i'm not even sure if time signature will be usefull at any point in time anyways)
 
-    def convert_to_midi_file(self, file_name_to_save: str):
-        midi = MIDICreator(self.tempo_bpm)
+    def convert_to_midi_file(self, prev_midi: MIDICreator = None) -> MIDICreator:
+        if prev_midi == None:
+            midi = MIDICreator(self.tempo_bpm)
+        else:
+            midi = prev_midi
         current_time = 0
         for i in range(len(self.bars)):
             for a in self.bars[i].notes:
                 for n in a:
                     midi.add_note(n.note + 20, current_time, n.beat_length)
                 current_time += a[0].beat_length
-        midi.save(file_name_to_save)
+        # midi.save(file_name_to_save)
+        return midi

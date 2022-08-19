@@ -96,7 +96,7 @@ class SongScraper:
         print("done equating")
         return piano_bar
 
-    def get_piece(self, song_url: str, line_limit: int = 10000) -> Piece:
+    def get_piece(self, song_url: str, line_limit: int = 10000, tempo_bpm: int = 60) -> Piece:
         LINE_CLASS_NAME = "Cw81bf" # container for each line, usually has 3 bars inside
         self.browser.get(song_url)
         self.wait_for_page()
@@ -121,7 +121,7 @@ class SongScraper:
             W = len(lines)
             print("new W:", W)
             print("\n\n")
-        return Piece(bars)
+        return Piece(bars, tempo_bpm = tempo_bpm)
 
     def wait_for_page(self):
         page_main = self.browser.find_elements(By.CSS_SELECTOR, "html")
@@ -138,9 +138,15 @@ class SongScraper:
 
 
 if __name__ == '__main__':
-
-    # url = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
-    url = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
+    from src.midi_utils import convert_multiple_pieces_to_midi
+    url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
+    url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
     self = SongScraper()
-    p = self.get_piece(url, line_limit = 12) #get first 8 lines
-    p.convert_to_midi_file("thingtestfinal")
+    linelim = 1
+    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    convert_multiple_pieces_to_midi([p1, p2], "finfin")
+    # midi_file1 = p1.convert_to_midi_file()
+    # midi_file1.save("yes0")
+    # midi_file2 = p2.convert_to_midi_file(midi_file1)
+    # midi_file2.save("yes2")
