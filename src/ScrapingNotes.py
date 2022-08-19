@@ -42,10 +42,11 @@ class SongScraper:
         notes = line.find_elements(By.TAG_NAME, "text")
         print("got 'notes', this many:", len(notes), "on this line")
 
-        piano_notes = []
+        piano_notes = {}
         for n in notes:
             if n.text in {"E", "B", "G", "D", "A"}: continue
             y = float(n.get_attribute("y"))
+            x = float(n.get_attribute("x"))
             if y < 0: continue
             string_index = y/12
             if string_index != int(string_index): continue
@@ -53,11 +54,19 @@ class SongScraper:
             fret_number = int(n.text)
             #todo: parse timings here as well (the parsing is already written, just not plugged in to this section of code)
             # print(string_index, fret_number)
-            piano_notes.append(GuitarTabNote(0, fret_number, string_index).convert_to_piano_note())
-        print("Here are notes: ")
-        for n in piano_notes: print(n.note, n.beat_length, end = "\t --- \t")
+
+            curnote = GuitarTabNote(0, fret_number, string_index).convert_to_piano_note()
+            if x not in piano_notes: piano_notes[x] = [curnote]
+            else: piano_notes[x].append(curnote)
+
+        cur_bar = Bar([])
+        for entry in sorted(piano_notes):
+            print("is it sorted", entry, piano_notes[entry])
+            cur_bar.notes.append(piano_notes[entry])
+        # print("Here are notes: ")
+        # for n in piano_notes: print(n.note, n.beat_length, end = "\t --- \t")
         print()
-        return Bar(piano_notes)
+        return cur_bar
 
     def get_line_timings(self, line):
         timings = line.find_elements(By.TAG_NAME, "path")[1:]
@@ -81,8 +90,9 @@ class SongScraper:
         print("done beat times, equating:")
         print(len(piano_bar.notes), len(beat_times), "<- (these should be equal)")
         for i in range(len(piano_bar.notes)):
-            print("equating number", i)
-            piano_bar.notes[i].beat_length = beat_times[i]
+            print("equating number", i, len(beat_times), len(piano_bar.notes))
+            for j in range(len(piano_bar.notes[i])):
+                piano_bar.notes[i][j].beat_length = beat_times[i]
         print("done equating")
         return piano_bar
 
@@ -129,6 +139,8 @@ class SongScraper:
 
 if __name__ == '__main__':
 
-    url = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
+    # url = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
+    url = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
     self = SongScraper()
     p = self.get_piece(url, line_limit = 12) #get first 8 lines
+    p.convert_to_midi_file("thingtestfinal")

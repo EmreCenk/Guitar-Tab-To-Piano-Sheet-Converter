@@ -47,7 +47,7 @@ class GuitarTabNote:
         return PianoNote(self.beat_length, guitar_string_index_to_piano_key[self.string_index] + self.fret_number)
 
 class Bar:
-    def __init__(self, notes: List[PianoNote]):
+    def __init__(self, notes: List[List[PianoNote]]):
         self.notes = notes
 
 class Piece:
@@ -61,7 +61,8 @@ class Piece:
         midi = MIDICreator(self.tempo_bpm)
         current_time = 0
         for i in range(len(self.bars)):
-            for n in self.bars[i].notes:
-                midi.add_note(n.note + 20, current_time, n.beat_length)
-                current_time += n.beat_length
+            for a in self.bars[i].notes:
+                for n in a:
+                    midi.add_note(n.note + 20, current_time, n.beat_length)
+                current_time += a[0].beat_length
         midi.save(file_name_to_save)
