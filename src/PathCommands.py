@@ -168,7 +168,7 @@ class PathCommandParser:
             lengths.append(1/2**number_of_intersections[k])
             # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
         self.dot_correction(lengths, verticals, horizontals)
-        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, lengths, verticals, (570, 90))
+        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, lengths, verticals, translation)
         return lengths
 
 class BeatCorrecter():

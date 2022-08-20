@@ -74,6 +74,17 @@ class SongScraper:
         for k in timings:
             if k.get_attribute("class") == "Bhq244":
                 correction_command = k.get_attribute("d")
+                break
+
+        translation_element = line.find_elements(By.CLASS_NAME, "Bhq8x")
+        if len(translation_element) > 0:
+            translation_string = translation_element[0].get_attribute("transform")
+            translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
+            translation = (float(translation_string[0]), float(translation_string[1]))
+        else:
+            translation = (0, 0)
+
+
 
         print("correction", correction_command)
         times = []
@@ -83,7 +94,7 @@ class SongScraper:
                 path_command = k.get_attribute("d")
                 parser = PathCommandParser()
                 # print(path_command)
-                beat_lengths = parser.path_command_to_beats(path_command, correction_command=correction_command)
+                beat_lengths = parser.path_command_to_beats(path_command, correction_command=correction_command, translation = translation)
                 for b in beat_lengths: times.append(b)
 
 
@@ -97,6 +108,7 @@ class SongScraper:
         print("starting beat times")
         beat_times = self.get_line_timings(line)
         print("done beat times, equating:")
+
         print(len(piano_bar.notes), len(beat_times), "<- (these should be equal)")
         for i in range(len(piano_bar.notes)):
             print("equating number", i, len(beat_times), len(piano_bar.notes))
@@ -153,11 +165,12 @@ if __name__ == '__main__':
     url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
     self = SongScraper()
     linelim = 5
-    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 45) #get first 12 lines
+    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
     # p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 45) #get first 12 lines
-    p3.tempo_bpm = 45
-    p1.convert_to_midi_file().save("p1")
+    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    # p3.tempo_bpm = 45
+    # p1.convert_to_midi_file().save("p1")
+    print("done")
     convert_multiple_pieces_to_midi([p1, p3], "nothing_broken_hopefully")
     p3.convert_to_midi_file().save("p3")
     # p1.convert_to_midi_file().save("ye")
