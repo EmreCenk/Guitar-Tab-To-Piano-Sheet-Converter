@@ -1,7 +1,8 @@
-
+import copy
 from collections import defaultdict
 from typing import *
 from src.MusicAbstractions import PianoNote, Bar
+from math import log2
 
 #TODO: THE DOTS AREN'T DETECTED (BC YOU DID NOT ACCOUNT FOR THEM IN THE CODE LOL)
 class Command:
@@ -70,20 +71,35 @@ class PathCommandParser:
         if command.command_letter == "M":
             self.x = command.inputs[0]
             self.y = command.inputs[1]
+            remaining_inputs = command.inputs[2:]
+
         elif command.command_letter == "m":
             self.x += command.inputs[0]
             self.y += command.inputs[1]
+            remaining_inputs = command.inputs[2:]
 
 
         elif command.command_letter == "V":
             self.y = command.inputs[0]
+            remaining_inputs = command.inputs[1:]
+
         elif command.command_letter == "v":
             self.y += command.inputs[0]
+            remaining_inputs = command.inputs[1:]
 
         elif command.command_letter == "H":
             self.x = command.inputs[0]
+            remaining_inputs = command.inputs[1:]
+
         elif command.command_letter == "h":
             self.x += command.inputs[0]
+            remaining_inputs = command.inputs[1:]
+        else:
+            remaining_inputs = []
+        if len(remaining_inputs) > 0:
+            rem_com = Command(command.command_letter)
+            rem_com.inputs = remaining_inputs
+            self.execute_command(rem_com)
 
     def get_vertical_and_horizontal_lines(self, commands: List[Command]) -> Tuple[List[int], List[Tuple[int, int]]]:
         """
@@ -124,7 +140,7 @@ class PathCommandParser:
             lengths[verticals.index(closest_vertical)] *= 1.5
         return lengths
 
-    def path_command_to_beats(self, command: str) -> List[float]:
+    def path_command_to_beats(self, command: str, correction_command: str = "", correction_coefficient: int = 2) -> List[float]:
         """
         Converts a path command to a list of beat lengths.
         :param command: The command to parse
@@ -149,6 +165,7 @@ class PathCommandParser:
             lengths.append(1/2**number_of_intersections[k])
             # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
         self.dot_correction(lengths, verticals, horizontals)
+        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, correction_coefficient, lengths, verticals, horizontals, self)
         return lengths
 
 class BeatCorrecter():
@@ -160,13 +177,51 @@ class BeatCorrecter():
     def __init__(self):
         pass
 
+
+
+
     @staticmethod
-    def correction_accounting_for_different_divisions(correction_command: str, text_in_correction_command: int, already_existing_beat: List[float]) -> List[float]:
+    def correction_accounting_for_different_divisions(correction_command: str,
+                                                      text_in_correction_command: int,
+                                                      already_existing_beat: List[float],
+                                                      verticals: List[float],
+                                                      horizontals: List[Tuple[float, float]],
+                                                      temporary_parser: PathCommandParser,
+                                                      expected_total: int = 3,
+                                                      ) -> List[float]:
         # correction_command = correction_command.replace(" ", "")
-        temporary_parser = PathCommandParser()
+
+        print("correcting command... ")
         commands = temporary_parser.convert_string_to_command_list(correction_command)
-        for com in commands:
-            print(com)
+        r = 0
+        l = float("inf")
+
+        for c in commands:
+            if c.command_letter == "M" and c.inputs == [0, 0]: continue
+            temporary_parser.execute_command(c)
+            r = max(r, temporary_parser.x)
+            l = min(l, temporary_parser.x)
+            print("CURX", temporary_parser.x)
+        print("L", l, r)
+        marked = set()
+        print("marked:", marked)
+        for i in range(len(verticals)):
+            print("V", verticals[i])
+            if l <= verticals[i] <= r:
+                #correct verticals[i]
+                marked.add(i)
+                # exponent = log2(1/verticals[i]) #how many times we divided
+                # verticals[i] = 1/(3**exponent)
+        print(marked)
+        sumbeat = 0
+        for i in range(len(already_existing_beat)):
+            if i not in marked: sumbeat += already_existing_beat[i]
+        remaining = expected_total - sumbeat
+
+        for i in marked:
+            print("old/new beats:", already_existing_beat[i], remaining/len(marked))
+            already_existing_beat[i] = remaining/len(marked)
+
 
         return already_existing_beat
 
@@ -181,10 +236,8 @@ if __name__ == '__main__':
 
     # s4 = "M316,74v18M352,74v18M316,90v2h36v-2zM388,83v9M462,74v18"
     s = PathCommandParser()
-    parsedinitial = s.path_command_to_beats(e4)
-
-    print(
-        BeatCorrecter.correction_accounting_for_different_divisions(e4_correction_command, 3, parsedinitial),
-    )
+    parsedinitial = s.path_command_to_beats(e4, correction_command=e4_correction_command, correction_coefficient=3)
+    print(parsedinitial)
+    print(sum(parsedinitial))
 
 

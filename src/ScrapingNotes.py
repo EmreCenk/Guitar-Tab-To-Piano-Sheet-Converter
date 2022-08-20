@@ -6,7 +6,7 @@ from time import perf_counter
 from selenium.webdriver.common.by import By
 from src.MusicAbstractions import GuitarTabNote, PianoNote, Piece, Bar
 from typing import *
-from src.PathCommands import PathCommandParser
+from src.PathCommands import PathCommandParser, BeatCorrecter
 
 class SongScraper:
 
@@ -70,15 +70,22 @@ class SongScraper:
 
     def get_line_timings(self, line):
         timings = line.find_elements(By.TAG_NAME, "path")[1:]
+        correction_command = " "
+        for k in timings:
+            if k.get_attribute("class") == "Bhq244":
+                correction_command = k.get_attribute("d")
+        print("correction", correction_command)
         times = []
         for k in timings:
             # print(k.get_attribute("class"))
-            if k.get_attribute("class") != "Gy73": continue
-            path_command = k.get_attribute("d")
-            parser = PathCommandParser()
-            # print(path_command)
-            beat_lengths = parser.path_command_to_beats(path_command)
-            for b in beat_lengths: times.append(b)
+            if k.get_attribute("class") == "Gy73":
+                path_command = k.get_attribute("d")
+                parser = PathCommandParser()
+                # print(path_command)
+                beat_lengths = parser.path_command_to_beats(path_command, correction_command=correction_command)
+                for b in beat_lengths: times.append(b)
+
+
 
         return times
 
@@ -146,10 +153,10 @@ if __name__ == '__main__':
     self = SongScraper()
     linelim = 5
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-
-    convert_multiple_pieces_to_midi([p1, p2, p3], "nothing_broken_hopefully")
+    # p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    p1.convert_to_midi_file().save("p1")
+    # convert_multiple_pieces_to_midi([p1, p2, p3], "nothing_broken_hopefully")
 
     # p1.convert_to_midi_file().save("ye")
     # midi_file1 = p1.convert_to_midi_file()
