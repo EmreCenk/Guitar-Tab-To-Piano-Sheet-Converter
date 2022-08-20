@@ -140,7 +140,10 @@ class PathCommandParser:
             lengths[verticals.index(closest_vertical)] *= 1.5
         return lengths
 
-    def path_command_to_beats(self, command: str, correction_command: str = "", correction_coefficient: int = 2) -> List[float]:
+    def path_command_to_beats(self, command: str,
+                              correction_command: str = "",
+                              correction_coefficient: int = 2,
+                              translation: Tuple[float, float] = (0, 0)) -> List[float]:
         """
         Converts a path command to a list of beat lengths.
         :param command: The command to parse
@@ -165,7 +168,7 @@ class PathCommandParser:
             lengths.append(1/2**number_of_intersections[k])
             # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
         self.dot_correction(lengths, verticals, horizontals)
-        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, correction_coefficient, lengths, verticals, horizontals, self)
+        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, lengths, verticals, (570, 90))
         return lengths
 
 class BeatCorrecter():
@@ -177,21 +180,21 @@ class BeatCorrecter():
     def __init__(self):
         pass
 
-
-
-
     @staticmethod
     def correction_accounting_for_different_divisions(correction_command: str,
-                                                      text_in_correction_command: int,
                                                       already_existing_beat: List[float],
                                                       verticals: List[float],
-                                                      horizontals: List[Tuple[float, float]],
-                                                      temporary_parser: PathCommandParser,
+                                                      translation: Tuple[float, float],
                                                       expected_total: int = 3,
                                                       ) -> List[float]:
         # correction_command = correction_command.replace(" ", "")
 
         print("correcting command... ")
+        print(correction_command)
+        temporary_parser = PathCommandParser()
+        temporary_parser.x = translation[0]
+        temporary_parser.y = translation[1]
+
         commands = temporary_parser.convert_string_to_command_list(correction_command)
         r = 0
         l = float("inf")
@@ -199,9 +202,12 @@ class BeatCorrecter():
         for c in commands:
             if c.command_letter == "M" and c.inputs == [0, 0]: continue
             temporary_parser.execute_command(c)
+            temporary_parser.x += translation[0]
+            temporary_parser.y += translation[1]
             r = max(r, temporary_parser.x)
             l = min(l, temporary_parser.x)
             print("CURX", temporary_parser.x)
+
         print("L", l, r)
         marked = set()
         print("marked:", marked)

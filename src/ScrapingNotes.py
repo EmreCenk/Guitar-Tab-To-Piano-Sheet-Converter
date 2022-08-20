@@ -74,6 +74,7 @@ class SongScraper:
         for k in timings:
             if k.get_attribute("class") == "Bhq244":
                 correction_command = k.get_attribute("d")
+
         print("correction", correction_command)
         times = []
         for k in timings:
@@ -152,12 +153,13 @@ if __name__ == '__main__':
     url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
     self = SongScraper()
     linelim = 5
-    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 45) #get first 12 lines
     # p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 45) #get first 12 lines
+    p3.tempo_bpm = 45
     p1.convert_to_midi_file().save("p1")
-    # convert_multiple_pieces_to_midi([p1, p2, p3], "nothing_broken_hopefully")
-
+    convert_multiple_pieces_to_midi([p1, p3], "nothing_broken_hopefully")
+    p3.convert_to_midi_file().save("p3")
     # p1.convert_to_midi_file().save("ye")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")
