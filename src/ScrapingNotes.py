@@ -172,7 +172,7 @@ if __name__ == '__main__':
     # p1.convert_to_midi_file().save("p1")
     print("done")
     convert_multiple_pieces_to_midi([p1, p3], "nothing_broken_hopefully")
-    p3.convert_to_midi_file().save("p3")
+    # p3.convert_to_midi_file().save("p3")
     # p1.convert_to_midi_file().save("ye")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")

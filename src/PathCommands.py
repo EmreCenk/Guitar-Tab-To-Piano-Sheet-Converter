@@ -4,7 +4,7 @@ from typing import *
 from src.MusicAbstractions import PianoNote, Bar
 from math import log2
 
-#TODO: THE DOTS AREN'T DETECTED (BC YOU DID NOT ACCOUNT FOR THEM IN THE CODE LOL)
+#TODO: [ACCOMPLISHED] THE DOTS AREN'T DETECTED (BC YOU DID NOT ACCOUNT FOR THEM IN THE CODE LOL)
 class Command:
     def __init__(self, command: str):
         # print(command, len(command))
@@ -68,7 +68,8 @@ class PathCommandParser:
         :param command:
         :return:
         """
-        if command.command_letter == "M":
+
+        if command.command_letter == "M" or command.command_letter == "L":
             self.x = command.inputs[0]
             self.y = command.inputs[1]
             remaining_inputs = command.inputs[2:]
@@ -200,13 +201,13 @@ class BeatCorrecter():
         l = float("inf")
 
         for c in commands:
-            if c.command_letter == "M" and c.inputs == [0, 0]: continue
+            # if c.command_letter == "M" and c.inputs == [0, 0]: continue
             temporary_parser.execute_command(c)
-            temporary_parser.x += translation[0]
-            temporary_parser.y += translation[1]
-            r = max(r, temporary_parser.x)
-            l = min(l, temporary_parser.x)
-            print("CURX", temporary_parser.x)
+            translated_x = temporary_parser.x + translation[0]
+            # translated_y = temporary_parser.y + translation[1]
+            print("curX", temporary_parser.x, translated_x)
+            r = max(r, translated_x)
+            l = min(l, translated_x)
 
         print("L", l, r)
         marked = set()
