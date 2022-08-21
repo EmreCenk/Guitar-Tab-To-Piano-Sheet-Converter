@@ -4,8 +4,7 @@ class PianoNote:
     def __init__(self, beat_length: int, note: int):
         """
         :param beat_length: How long the note lasts for
-        :param note: which note to play
-        Todo: figure out how you actually want to store a pitch (an integer should probably do?)
+        :param note: which note to play (a note of -1 indicates a rest)
 
         Note: Mapping notes to beat lengths is shown below:
         Whole note -> 4
@@ -57,16 +56,8 @@ class Piece:
         # self.time_signature = ...
         # todo: finding time signature and simplifying it is not as easy as it seems (i'm not even sure if time signature will be usefull at any point in time anyways)
 
-    def convert_to_midi_file(self, prev_midi: MIDICreator = None) -> MIDICreator:
-        if prev_midi == None:
-            midi = MIDICreator(self.tempo_bpm)
-        else:
-            midi = prev_midi
-        current_time = 0
-        for i in range(len(self.bars)):
-            for a in self.bars[i].notes:
-                for n in a:
-                    midi.add_note(n.note + 20, current_time, n.beat_length)
-                current_time += a[0].beat_length
-        # midi.save(file_name_to_save)
+    def save_as_midi(self, name_to_save: str) -> MIDICreator:
+        from src.midi_utils import convert_multiple_pieces_to_midi
+
+        midi = convert_multiple_pieces_to_midi([self], name_to_save)
         return midi

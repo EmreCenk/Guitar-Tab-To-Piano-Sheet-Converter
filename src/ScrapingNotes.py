@@ -40,20 +40,33 @@ class SongScraper:
     def get_line_notes(self, line) -> Bar:
         print("get_line_notes()")
         notes = line.find_elements(By.TAG_NAME, "text")
-        print("got 'notes', this many:", len(notes), "on this line")
+        rests = [k for k in line.find_elements(By.TAG_NAME, "use") if "rest" in k.get_attribute("href")]
 
         piano_notes = {}
+
+        for r in rests:
+            translation_string = r.get_attribute("transform")
+            translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
+            x, y = float(translation_string[0]), float(translation_string[1])
+            curnote = PianoNote(0, -1)
+            if x not in piano_notes: piano_notes[x] = [curnote]
+            else: piano_notes[x].append(curnote)
+
+        print("got 'notes', this many:", len(notes), "on this line")
+
         for n in notes:
             if n.text in {"E", "B", "G", "D", "A"}: continue
+
             y = float(n.get_attribute("y"))
             x = float(n.get_attribute("x"))
+
             if y < 0: continue
+
             string_index = y/12
             if string_index != int(string_index): continue
             string_index = int(string_index)
-            fret_number = int(n.text)
-            #todo: parse timings here as well (the parsing is already written, just not plugged in to this section of code)
-            # print(string_index, fret_number)
+            fret_number = int(n.text.replace("(", "").replace(")", ""))
+
 
             curnote = GuitarTabNote(0, fret_number, string_index).convert_to_piano_note()
             if x not in piano_notes: piano_notes[x] = [curnote]
@@ -160,18 +173,27 @@ class SongScraper:
 
 if __name__ == '__main__':
     from src.midi_utils import convert_multiple_pieces_to_midi
-    url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
-    url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
-    url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
+    # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
+    # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
+    # url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
+    url1 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319"
+    url2 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319t2"
     self = SongScraper()
     linelim = 15
-    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
-    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    tempo_bpm = 120
+    p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
+    p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
+    # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
     # p3.tempo_bpm = 45
     # p1.convert_to_midi_file().save("p1")
     print("done")
-    convert_multiple_pieces_to_midi([p1, p2, p3], "nothing_broken_hopefully")
+    convert_multiple_pieces_to_midi([
+                                     p1,
+                                     p2,
+                                     # p3
+                                     ], "second_song_tried")
+
+    self.browser.close()
     # p3.convert_to_midi_file().save("p3")
     # p1.convert_to_midi_file().save("ye")
     # midi_file1 = p1.convert_to_midi_file()
