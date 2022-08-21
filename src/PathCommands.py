@@ -79,7 +79,17 @@ class PathCommandParser:
         :return:
         """
 
-        if command.command_letter == "M" or command.command_letter == "L":
+        if command.command_letter == "C":
+            self.x = command.inputs[-2]
+            self.y = command.inputs[-1]
+            remaining_inputs = []
+
+        elif command.command_letter == "c":
+            self.x += command.inputs[-2]
+            self.y += command.inputs[-1]
+            remaining_inputs = []
+
+        elif command.command_letter in {"M", "L"}:
             self.x = command.inputs[0]
             self.y = command.inputs[1]
             remaining_inputs = command.inputs[2:]
@@ -192,21 +202,12 @@ class BeatCorrecter():
         pass
 
     @staticmethod
-    def correction_accounting_for_different_divisions(correction_command: str,
-                                                      already_existing_beat: List[float],
-                                                      verticals: List[float],
-                                                      translation: Tuple[float, float],
-                                                      expected_total: int = 3,
-                                                      ) -> List[float]:
-        # correction_command = correction_command.replace(" ", "")
-
-        print("correcting command... ")
-        print(correction_command)
+    def get_min_and_max_of_cmd( commands: List[Command], translation: Tuple[float, float] = (0, 0)):
         temporary_parser = PathCommandParser()
+
         temporary_parser.x = translation[0]
         temporary_parser.y = translation[1]
 
-        commands = temporary_parser.convert_string_to_command_list(correction_command)
         r = 0
         l = float("inf")
 
@@ -218,6 +219,25 @@ class BeatCorrecter():
             print("curX", temporary_parser.x, translated_x)
             r = max(r, translated_x)
             l = min(l, translated_x)
+        return l, r
+
+    @staticmethod
+    def correction_accounting_for_different_divisions(correction_command: str,
+                                                      already_existing_beat: List[float],
+                                                      verticals: List[float],
+                                                      translation: Tuple[float, float],
+                                                      expected_total: int = 3,
+                                                      ) -> List[float]:
+        # correction_command = correction_command.replace(" ", "")
+
+        print("correcting command... ")
+        print(correction_command)
+
+
+        commands = PathCommandParser().convert_string_to_command_list(correction_command)
+        l, r = BeatCorrecter.__get_min_and_max_of_cmd(commands, translation)
+
+
 
         print("L", l, r)
         marked = set()
@@ -258,7 +278,7 @@ if __name__ == '__main__':
 
     s = PathCommandParser()
     commands = s.convert_string_to_command_list(e5)
-    for c in commands: print(c)
+    print(BeatCorrecter.get_min_and_max_of_cmd(commands, translation = (0, 0)))
     # print(parsedinitial)
     # print(sum(parsedinitial))
 
