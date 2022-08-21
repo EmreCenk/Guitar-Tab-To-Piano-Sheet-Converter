@@ -246,6 +246,8 @@ if __name__ == '__main__':
                                      # p3
                                      ], "second_song_tried")
 
+    #fml
+
     self.browser.close()
     p2.save_as_midi("p2")
     p1.save_as_midi("p1")
