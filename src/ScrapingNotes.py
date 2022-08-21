@@ -55,13 +55,15 @@ class SongScraper:
 
         print("got 'notes', this many:", len(notes), "on this line")
 
-        #accounting for extensions:
-        extensions = line.find_elements(By.CLASS_NAME, "Bbl9p")
-        for e in extensions:
-            path_command = e.get_attribute("d")
-            temporary_parser = PathCommandParser()
-            commands = temporary_parser.convert_string_to_command_list(path_command)
-            for c in commands: print(c)
+        def convert_to_note(y, n):
+
+            string_index = int(y/12)
+            string_index = int(string_index)
+            fret_number = int(n.text.replace("(", "").replace(")", ""))
+
+
+            curnote = GuitarTabNote(0, fret_number, string_index).convert_to_piano_note()
+            return curnote
 
         for n in notes:
             if n.text in {"E", "B", "G", "D", "A"}: continue
@@ -70,16 +72,56 @@ class SongScraper:
             x = float(n.get_attribute("x"))
 
             if y < 0: continue
-
             string_index = y/12
             if string_index != int(string_index): continue
-            string_index = int(string_index)
-            fret_number = int(n.text.replace("(", "").replace(")", ""))
 
+            curnote = convert_to_note(y, n)
 
-            curnote = GuitarTabNote(0, fret_number, string_index).convert_to_piano_note()
             if x not in piano_notes: piano_notes[x] = [curnote]
             else: piano_notes[x].append(curnote)
+
+        epsilon = 8  # how many pixels is close enough to 0?
+
+        def get_closest(notes, l, r, miny, maxy):
+            #I'm functioning on very low sleep
+            # I'm 99% sure I can solve this more elegantly but at this point I'm so scared I'm gonna break something tiny by accident
+            # that I'm not even going to attempt the cool solution
+            # so here's the uncool version you get :(
+
+            ay = (maxy+miny)/2
+            goodnotes = []
+            for n in notes:
+                xc = float(n.get_attribute("x"))
+                yc = float(n.get_attribute("y"))
+                if not(xc < l): continue
+                if abs(yc - ay) > epsilon: continue
+                goodnotes.append(n)
+                #definitely on same y
+            return min(goodnotes, key = lambda item: abs(float(item.get_attribute("x")) - l))
+        #accounting for extensions:
+        extensions = line.find_elements(By.CLASS_NAME, "Bbl9p")
+        for e in extensions:
+            path_command = e.get_attribute("d")
+            temporary_parser = PathCommandParser()
+            commands = temporary_parser.convert_string_to_command_list(path_command)
+
+            l, r = BeatCorrecter.get_min_and_max_of_cmd(commands)
+            min_y, max_y = BeatCorrecter.get_min_and_max_y(commands)
+
+            # closest = min(notes, key = lambda item: abs(float(item.) - l) + abs(float(item.get_attribute("y")) - average_y)) #closest by manhattan distance
+            closest = get_closest(notes, l, r, min_y, max_y)
+            closest = convert_to_note(float(closest.get_attribute("y")), closest)
+
+            done = False
+            for entry in piano_notes:
+                if abs(entry - r) <= epsilon:
+                    piano_notes[entry].append(closest)
+                    done = True
+                    break
+
+            if not done:
+                if r not in piano_notes: piano_notes[r] = [closest]
+                else: piano_notes[r].append(closest)
 
         cur_bar = Bar([])
         for entry in sorted(piano_notes):
@@ -132,6 +174,8 @@ class SongScraper:
         print("done beat times, equating:")
 
         print(len(piano_bar.notes), len(beat_times), "<- (these should be equal)")
+        print("beat times:", beat_times)
+
         for i in range(len(piano_bar.notes)):
             print("equating number", i, len(beat_times), len(piano_bar.notes))
             for j in range(len(piano_bar.notes[i])):
@@ -188,7 +232,7 @@ if __name__ == '__main__':
     url1 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319"
     url2 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319t2"
     self = SongScraper()
-    linelim = 15
+    linelim = 4
     tempo_bpm = 120
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
@@ -203,8 +247,8 @@ if __name__ == '__main__':
                                      ], "second_song_tried")
 
     self.browser.close()
-    # p3.convert_to_midi_file().save("p3")
-    # p1.convert_to_midi_file().save("ye")
+    p2.save_as_midi("p2")
+    p1.save_as_midi("p1")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")
     # midi_file2 = p2.convert_to_midi_file(midi_file1)
