@@ -7,19 +7,29 @@ from math import log2
 #TODO: [ACCOMPLISHED] THE DOTS AREN'T DETECTED (BC YOU DID NOT ACCOUNT FOR THEM IN THE CODE LOL)
 class Command:
     def __init__(self, command: str):
-        # print(command, len(command))
+        print(command)
         self.command_letter = command[0]
         self.inputs = []
 
-
-        for k in command[1:].split(" "):
+        string_inputs_separated = command[1:].split(" ")
+        if self.command_letter in {"c", "C"}:
+            final = []
+            for k in string_inputs_separated:
+                if "-" in k:
+                    final.extend(k.split("-"))
+                    final[-1] = "-" + final[-1]
+                else:
+                    final.append(k)
+            string_inputs_separated = final
+        print(string_inputs_separated)
+        for k in string_inputs_separated:
             if len(k) == 0: continue
             k = k.split(",")
             for i in range(len(k)):
                 self.inputs.append(int(k[i]))
 
-
-
+        print(self.inputs)
+        print()
     def __str__(self):
         w = self.command_letter
         if len(self.inputs) == 0: return w + ": ()"
@@ -238,13 +248,18 @@ if __name__ == '__main__':
     # e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     # e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
 
-    e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
-    e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
+    # e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
+    # e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
 
     # s4 = "M316,74v18M352,74v18M316,90v2h36v-2zM388,83v9M462,74v18"
+
+    #testing curves:
+    e5 = 'M305 31c10 7 27 7 37 0c-10 6-27 6-37 0z'
+
     s = PathCommandParser()
-    parsedinitial = s.path_command_to_beats(e4, correction_command=e4_correction_command, correction_coefficient=3)
-    print(parsedinitial)
-    print(sum(parsedinitial))
+    commands = s.convert_string_to_command_list(e5)
+    for c in commands: print(c)
+    # print(parsedinitial)
+    # print(sum(parsedinitial))
 
 

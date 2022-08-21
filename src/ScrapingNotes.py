@@ -44,6 +44,7 @@ class SongScraper:
 
         piano_notes = {}
 
+        #accounting for rests
         for r in rests:
             translation_string = r.get_attribute("transform")
             translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
@@ -53,6 +54,14 @@ class SongScraper:
             else: piano_notes[x].append(curnote)
 
         print("got 'notes', this many:", len(notes), "on this line")
+
+        #accounting for extensions:
+        extensions = line.find_elements(By.CLASS_NAME, "Bbl9p")
+        for e in extensions:
+            path_command = e.get_attribute("d")
+            temporary_parser = PathCommandParser()
+            commands = temporary_parser.convert_string_to_command_list(path_command)
+            for c in commands: print(c)
 
         for n in notes:
             if n.text in {"E", "B", "G", "D", "A"}: continue
