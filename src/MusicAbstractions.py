@@ -70,7 +70,7 @@ class Piece:
         midi = convert_multiple_pieces_to_midi([self], name_to_save)
         return midi
 
-    def get_notes(self):
+    def get_notes(self) -> List[PianoNote]:
         notes = []
         for bar in self.bars:
             for note in bar.get_notes():
