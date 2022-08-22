@@ -38,7 +38,7 @@ class SongScraper:
 
         # self.browser.maximize_window()
     def get_line_notes(self, line) -> Bar:
-        print("get_line_notes()")
+        # print("get_line_notes()")
         notes = line.find_elements(By.TAG_NAME, "text")
         rests = [k for k in line.find_elements(By.TAG_NAME, "use") if "rest" in k.get_attribute("href")]
 
@@ -53,7 +53,7 @@ class SongScraper:
             if x not in piano_notes: piano_notes[x] = [curnote]
             else: piano_notes[x].append(curnote)
 
-        print("got 'notes', this many:", len(notes), "on this line")
+        # print("got 'notes', this many:", len(notes), "on this line")
 
         def convert_to_note(n):
             y = float(n.get_attribute("y"))
@@ -98,6 +98,9 @@ class SongScraper:
                 if abs(yc - ay) > epsilon: continue
                 goodnotes.append(n)
                 #definitely on same y
+            if len(goodnotes) == 0:
+                #THE CARRY NOTE WAS ON THE PREVIOUS TAB, BUT I HAVEN'T FIXED THAT YET SO HERE'S A TEMPORARY SOLUTION:
+                return None
             return min(goodnotes, key = lambda item: abs(float(item.get_attribute("x")) - l))
 
         #accounting for extensions:
@@ -111,6 +114,7 @@ class SongScraper:
             min_y, max_y = BeatCorrecter.get_min_and_max_y(commands)
 
             closest_note_element = get_closest(notes, l, r, min_y, max_y)
+            if closest_note_element is None: continue
             closest = convert_to_note(closest_note_element)
 
             done = False
@@ -127,11 +131,11 @@ class SongScraper:
 
         cur_bar = Bar([])
         for entry in sorted(piano_notes):
-            print("is it sorted", entry, piano_notes[entry])
+            # print("is it sorted", entry, piano_notes[entry])
             cur_bar.notes.append(piano_notes[entry])
         # print("Here are notes: ")
         # for n in piano_notes: print(n.note, n.beat_length, end = "\t --- \t")
-        print()
+        # print()
         return cur_bar
 
     def get_line_timings(self, line):
@@ -152,7 +156,7 @@ class SongScraper:
 
 
 
-        print("correction", correction_command)
+        # print("correction", correction_command)
         times = []
         for k in timings:
             # print(k.get_attribute("class"))
@@ -168,36 +172,41 @@ class SongScraper:
         return times
 
     def parse_line(self, line) -> Bar:
-        print("parsing line...")
+        # print("parsing line...")
         piano_bar = self.get_line_notes(line)
 
-        print("starting beat times")
+        # print("starting beat times")
         beat_times = self.get_line_timings(line)
-        print("done beat times, equating:")
+        # print("done beat times, equating:")
 
-        print(len(piano_bar.notes), len(beat_times), "<- (these should be equal)")
-        print("beat times:", beat_times)
+        #print(len(piano_bar.notes), len(beat_times), "<- (these should be equal)")
+        #print("beat times:", beat_times)
 
-        for i in range(len(piano_bar.notes)):
-            print("equating number", i, len(beat_times), len(piano_bar.notes))
+        for i in range(min(len(piano_bar.notes), len(beat_times))):
+            # print("equating number", i, len(beat_times), len(piano_bar.notes))
             for j in range(len(piano_bar.notes[i])):
                 piano_bar.notes[i][j].beat_length = beat_times[i]
-        print("done equating")
+        # print("done equating")
         return piano_bar
 
     def get_piece(self, song_url: str, line_limit: int = 10000, tempo_bpm: int = 60) -> Piece:
+        from time import sleep
         LINE_CLASS_NAME = "Cw81bf" # container for each line, usually has 3 bars inside
         self.browser.get(song_url)
         self.wait_for_page()
         self.browser.implicitly_wait(2)
-        print("opened url:", song_url)
+        for i in range(10):
+            self.browser.execute_script("window.scrollBy(0, 1000);")
+            # self.browser.implicitly_wait(0.5)
+            sleep(0.5)
+        # print("opened url:", song_url)
 
         lines = self.browser.find_elements(By.CLASS_NAME, LINE_CLASS_NAME)
-        print(f"got this lines, this many in fact: {len(lines)}")
+        # print(f"got this lines, this many in fact: {len(lines)}")
 
         bars = []
         W = len(lines)
-        print("new W (first):", W)
+        # print("new W (first):", W)
         i = 0
         while i < W and i < line_limit:
 
@@ -208,8 +217,9 @@ class SongScraper:
             i += 1
             lines = self.browser.find_elements(By.CLASS_NAME, LINE_CLASS_NAME)
             W = len(lines)
-            print("new W:", W)
-            print("\n\n")
+            # print("new W:", W)
+            # print("\n\n")
+        print("done with piece\n")
         return Piece(bars, tempo_bpm = tempo_bpm)
 
     def wait_for_page(self):
@@ -230,7 +240,7 @@ if __name__ == '__main__':
     from src.midi_utils import convert_multiple_pieces_to_midi
     url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
     url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
-    # url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
+    url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
 
     #curse my name:
     # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319"
@@ -241,18 +251,18 @@ if __name__ == '__main__':
     # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-the-bards-song-tab-s66295t1"
 
     self = SongScraper()
-    linelim = 2
+    linelim = 31
     tempo_bpm = 90
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
-    # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines
+    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3.tempo_bpm = 45
     # p1.convert_to_midi_file().save("p1")
     print("done")
     convert_multiple_pieces_to_midi([
                                      p1,
                                      p2,
-                                     # p3
+                                     p3
                                      ], "second_song_tried")
 
     #fml

@@ -257,8 +257,8 @@ class BeatCorrecter():
                                                       ) -> List[float]:
         # correction_command = correction_command.replace(" ", "")
 
-        print("correcting command... ")
-        print(correction_command)
+        # print("correcting command... ")
+        # print(correction_command)
 
 
         commands = PathCommandParser().convert_string_to_command_list(correction_command)
@@ -266,24 +266,24 @@ class BeatCorrecter():
 
 
 
-        print("L", l, r)
+        # print("L", l, r)
         marked = set()
-        print("marked:", marked)
+        # print("marked:", marked)
         for i in range(len(verticals)):
-            print("V", verticals[i])
+            # print("V", verticals[i])
             if l <= verticals[i] <= r:
                 #correct verticals[i]
                 marked.add(i)
                 # exponent = log2(1/verticals[i]) #how many times we divided
                 # verticals[i] = 1/(3**exponent)
-        print(marked)
+        # print(marked)
         sumbeat = 0
         for i in range(len(already_existing_beat)):
             if i not in marked: sumbeat += already_existing_beat[i]
         remaining = expected_total - sumbeat
 
         for i in marked:
-            print("old/new beats:", already_existing_beat[i], remaining/len(marked))
+            # print("old/new beats:", already_existing_beat[i], remaining/len(marked))
             already_existing_beat[i] = remaining/len(marked)
 
 
