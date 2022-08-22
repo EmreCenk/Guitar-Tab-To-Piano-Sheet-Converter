@@ -49,20 +49,21 @@ class SongScraper:
             translation_string = r.get_attribute("transform")
             translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
             x, y = float(translation_string[0]), float(translation_string[1])
-            curnote = PianoNote(0, -1)
+            curnote = PianoNote(0, -1, coordinate=(x, y))
             if x not in piano_notes: piano_notes[x] = [curnote]
             else: piano_notes[x].append(curnote)
 
         print("got 'notes', this many:", len(notes), "on this line")
 
-        def convert_to_note(y, n):
-
+        def convert_to_note(n):
+            y = float(n.get_attribute("y"))
             string_index = int(y/12)
             string_index = int(string_index)
             fret_number = int(n.text.replace("(", "").replace(")", ""))
 
 
             curnote = GuitarTabNote(0, fret_number, string_index).convert_to_piano_note()
+            curnote.coordinate = (float(n.get_attribute("x")), float(n.get_attribute("y")))
             return curnote
 
         for n in notes:
@@ -75,7 +76,7 @@ class SongScraper:
             string_index = y/12
             if string_index != int(string_index): continue
 
-            curnote = convert_to_note(y, n)
+            curnote = convert_to_note(n)
 
             if x not in piano_notes: piano_notes[x] = [curnote]
             else: piano_notes[x].append(curnote)
@@ -83,7 +84,7 @@ class SongScraper:
         epsilon = 8  # how many pixels is close enough to 0?
 
         def get_closest(notes, l, r, miny, maxy):
-            #I'm functioning on very low sleep
+            # I'm functioning on very low sleep
             # I'm 99% sure I can solve this more elegantly but at this point I'm so scared I'm gonna break something tiny by accident
             # that I'm not even going to attempt the cool solution
             # so here's the uncool version you get :(
@@ -98,6 +99,7 @@ class SongScraper:
                 goodnotes.append(n)
                 #definitely on same y
             return min(goodnotes, key = lambda item: abs(float(item.get_attribute("x")) - l))
+
         #accounting for extensions:
         extensions = line.find_elements(By.CLASS_NAME, "Bbl9p")
         for e in extensions:
@@ -108,11 +110,11 @@ class SongScraper:
             l, r = BeatCorrecter.get_min_and_max_of_cmd(commands)
             min_y, max_y = BeatCorrecter.get_min_and_max_y(commands)
 
-            # closest = min(notes, key = lambda item: abs(float(item.) - l) + abs(float(item.get_attribute("y")) - average_y)) #closest by manhattan distance
-            closest = get_closest(notes, l, r, min_y, max_y)
-            closest = convert_to_note(float(closest.get_attribute("y")), closest)
+            closest_note_element = get_closest(notes, l, r, min_y, max_y)
+            closest = convert_to_note(closest_note_element)
 
             done = False
+
             for entry in piano_notes:
                 if abs(entry - r) <= epsilon:
                     piano_notes[entry].append(closest)

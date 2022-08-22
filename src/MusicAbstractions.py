@@ -1,7 +1,7 @@
 from typing import *
 from src.midi import MIDICreator
 class PianoNote:
-    def __init__(self, beat_length: int, note: int):
+    def __init__(self, beat_length: int, note: int, coordinate: Tuple[float, float] = (0, 0)):
         """
         :param beat_length: How long the note lasts for
         :param note: which note to play (a note of -1 indicates a rest)
@@ -16,6 +16,7 @@ class PianoNote:
         """
         self.beat_length = beat_length
         self.note = note
+        self.coordinate = coordinate
 
 class GuitarTabNote:
     def __init__(self, beat_length: int, guitar_fret_number: int, guitar_string_index: int):
@@ -49,6 +50,13 @@ class Bar:
     def __init__(self, notes: List[List[PianoNote]]):
         self.notes = notes
 
+    def get_notes(self):
+        notes = []
+        for k in self.notes:
+            for j in k:
+                notes.append(j)
+        return notes
+
 class Piece:
     def __init__(self, bars: List[Bar], tempo_bpm: int = 60):
         self.bars = bars
@@ -61,3 +69,10 @@ class Piece:
 
         midi = convert_multiple_pieces_to_midi([self], name_to_save)
         return midi
+
+    def get_notes(self):
+        notes = []
+        for bar in self.bars:
+            for note in bar.get_notes():
+                notes.append(note)
+        return notes

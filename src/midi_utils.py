@@ -5,6 +5,10 @@ from typing import*
 from src.midi import MIDICreator
 from src.MusicAbstractions import Piece
 
+
+def merge_identical_ids(piece: Piece):
+    pass
+
 def convert_multiple_pieces_to_midi(pieces: List[Piece], file_name_to_save: str):
 
     midi = MIDICreator(pieces[0].tempo_bpm)
