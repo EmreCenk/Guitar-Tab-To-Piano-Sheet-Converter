@@ -228,14 +228,21 @@ class SongScraper:
 
 if __name__ == '__main__':
     from src.midi_utils import convert_multiple_pieces_to_midi
-    # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
-    # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
-    # url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
-    url1 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319"
-    url2 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319t2"
+    url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
+    url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
+    # url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
+
+    #curse my name:
+    # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319"
+    # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319t2"
+
+    #bards song:
+    # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-the-bards-song-tab-s66295"
+    # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-the-bards-song-tab-s66295t1"
+
     self = SongScraper()
-    linelim = 4
-    tempo_bpm = 120
+    linelim = 2
+    tempo_bpm = 90
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = 90) #get first 12 lines

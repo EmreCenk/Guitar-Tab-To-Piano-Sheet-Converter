@@ -141,7 +141,7 @@ class PathCommandParser:
 
         for i in range(len(commands)):
             if commands[i].command_letter.lower() == "v":
-                if commands[i].inputs[0] == 18:
+                if commands[i].inputs[0] in {9, 18}:
                 # if commands[i-1].command_letter == "M":
                     verticals.append(self.x) # x coordinate of where we last moved
                 # else:
