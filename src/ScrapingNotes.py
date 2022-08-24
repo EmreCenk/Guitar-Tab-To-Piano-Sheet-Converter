@@ -238,9 +238,10 @@ class SongScraper:
 
 if __name__ == '__main__':
     from src.midi_utils import convert_multiple_pieces_to_midi
-    url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
-    url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
-    url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
+    #skalds and shadows:
+    # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036"
+    # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t2"
+    # url3 = "https://www.songsterr.com/a/wsa/blind-guardian-skalds-and-shadows-tab-s27036t1"
 
     #curse my name:
     # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-curse-my-name-tab-s434319"
@@ -250,19 +251,23 @@ if __name__ == '__main__':
     # url1 = "https://www.songsterr.com/a/wsa/blind-guardian-the-bards-song-tab-s66295"
     # url2 = "https://www.songsterr.com/a/wsa/blind-guardian-the-bards-song-tab-s66295t1"
 
+
+    # Sun Eater - Lorna Shore
+    url1 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139"
+    url2 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139t1"
     self = SongScraper()
-    linelim = 31
+    linelim = 10
     tempo_bpm = 90
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
-    p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
+    # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3.tempo_bpm = 45
     # p1.convert_to_midi_file().save("p1")
     print("done")
     convert_multiple_pieces_to_midi([
                                      p1,
                                      p2,
-                                     p3
+                                     # p3
                                      ], "second_song_tried")
 
     #fml
