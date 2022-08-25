@@ -256,25 +256,27 @@ if __name__ == '__main__':
     url1 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139"
     url2 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139t1"
     self = SongScraper()
-    linelim = 10
+    linelim = 3
     tempo_bpm = 90
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
-    p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
+    p1.save_as_midi("p1")
+
+    # p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3.tempo_bpm = 45
     # p1.convert_to_midi_file().save("p1")
-    print("done")
-    convert_multiple_pieces_to_midi([
-                                     p1,
-                                     p2,
-                                     # p3
-                                     ], "second_song_tried")
+    # print("done")
+    # convert_multiple_pieces_to_midi([
+    #                                  p1,
+    #                                  p2,
+    #                                  p3
+    #                                  ], "second_song_tried")
 
     #fml
 
     self.browser.close()
-    p2.save_as_midi("p2")
-    p1.save_as_midi("p1")
+    # p2.save_as_midi("p2")
+    # p1.save_as_midi("p1")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")
     # midi_file2 = p2.convert_to_midi_file(midi_file1)
