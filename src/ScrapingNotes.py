@@ -266,17 +266,19 @@ if __name__ == '__main__':
     # p3.tempo_bpm = 45
     # p1.convert_to_midi_file().save("p1")
     # print("done")
+
+    p2.volume_percentage = 0.8 #the left hand being slightly quieter makes this piece better in my opinion
     convert_multiple_pieces_to_midi([
                                      p1,
                                      p2,
                                      # p3
-                                     ], "lorna")
+                                     ], "Sun Eater final")
 
     #fml
 
     self.browser.close()
-    p2.save_as_midi("p2")
-    p1.save_as_midi("p1")
+    p2.save_as_midi("Sun Eater Tab 2")
+    p1.save_as_midi("Sun Eater Tab 1")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")
     # midi_file2 = p2.convert_to_midi_file(midi_file1)
