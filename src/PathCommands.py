@@ -171,7 +171,7 @@ class PathCommandParser:
         return lengths
 
     def path_command_to_beats(self, command: str,
-                              correction_command: str = "",
+                              correction_commands: Iterable[str] = (""),
                               correction_coefficient: int = 2,
                               translation: Tuple[float, float] = (0, 0)) -> List[float]:
         """
@@ -198,7 +198,7 @@ class PathCommandParser:
             lengths.append(1/2**number_of_intersections[k])
             # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
         self.dot_correction(lengths, verticals, horizontals)
-        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, lengths, verticals, translation)
+        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_commands, lengths, verticals, translation, expected_total=1)
         return lengths
 
 class BeatCorrecter():
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     # example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     # example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
     # e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
-    e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
+    # e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
 
     # e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
     # e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
@@ -303,11 +303,12 @@ if __name__ == '__main__':
     #testing curves:
     # e5 = 'M305 31c10 7 27 7 37 0c-10 6-27 6-37 0z'
 
+    path_command, correction_commands
     #gave error at some point for some reason: (should give 3 verticals):
     # e6 = "M99,74v18M156,74v18M213,74v18"
-    s = PathCommandParser()
+    # s = PathCommandParser()
     # for c in s.convert_string_to_command_list(e6): print(c)
-    print(s.path_command_to_beats(e3))
+    # print(s.path_command_to_beats(e3))
     # commands = s.convert_string_to_command_list(e5)
     # print(BeatCorrecter.get_min_and_max_of_cmd(commands, translation = (0, 0)))
     # print(BeatCorrecter.get_min_and_max_y(commands, translation = (0, 0)))

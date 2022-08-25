@@ -140,32 +140,46 @@ class SongScraper:
 
     def get_line_timings(self, line):
         timings = line.find_elements(By.TAG_NAME, "path")[1:]
-        correction_command = " "
+        #todo: multiple correction commands
+        correction_commands = []
+
+        #todo: following for loop could probably be optimized by using something built-in
+        correction_neededs = set()
+        i = 0
         for k in timings:
             if k.get_attribute("class") == "Bhq244":
-                correction_command = k.get_attribute("d")
-                break
+                correction_commands.append(k.get_attribute("d"))
+                correction_neededs.add(i)
+                i += 1
 
-        translation_element = line.find_elements(By.CLASS_NAME, "Bhq8x")
-        if len(translation_element) > 0:
-            translation_string = translation_element[0].get_attribute("transform")
+        translations = []
+        for translation_element in line.find_elements(By.CLASS_NAME, "Bhq8x"):
+            translation_string = translation_element.get_attribute("transform")
             translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
-            translation = (float(translation_string[0]), float(translation_string[1]))
-        else:
-            translation = (0, 0)
+            translations.append((float(translation_string[0]), float(translation_string[1])))
 
-
+        #note: translations[i] is the translation for correction_commands[i]
+        if len(translations) == 0:
+            translations = [(0, 0)]
 
         # print("correction", correction_command)
         times = []
+        section_number = 0
         for k in timings:
             # print(k.get_attribute("class"))
             if k.get_attribute("class") == "Gy73":
                 path_command = k.get_attribute("d")
                 parser = PathCommandParser()
-                # print(path_command)
-                beat_lengths = parser.path_command_to_beats(path_command, correction_command=correction_command, translation = translation)
+
+                current_translation = (0, 0)
+                if section_number in correction_neededs:
+                    current_translation = translations[section_number]
+
+                beat_lengths = parser.path_command_to_beats(path_command,
+                                                            correction_command=correction_commands[section_number],
+                                                            translation = current_translation)
                 for b in beat_lengths: times.append(b)
+                section_number += 1
 
 
 
