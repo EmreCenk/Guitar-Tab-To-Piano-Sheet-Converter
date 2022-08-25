@@ -171,14 +171,19 @@ class PathCommandParser:
         return lengths
 
     def path_command_to_beats(self, command: str,
-                              correction_command: str = "",
-                              translation: Tuple[float, float] = (0, 0)) -> List[float]:
+                              correction_commands: List[str] = None,
+                              translations: List[Tuple[float, float]] = None) -> List[float]:
         """
         Converts a path command to a list of beat lengths.
         :param command: The command to parse
         :return: A list of beats showing how long each note should last
         Note: look at Note class in src/MusicAbstractions.py to see which beat length maps to which integer
         """
+        if translations is None:
+            translations = []
+
+        if correction_commands is None:
+            correction_commands = []
 
         commands = self.convert_string_to_command_list(command)
         # for c in commands: print(c)
@@ -197,7 +202,12 @@ class PathCommandParser:
             lengths.append(1/2**number_of_intersections[k])
             # todo: notes can't last longer than a single beat (i've never seen 1+ beats before so when i encounter them, i'll have to fix this)
         self.dot_correction(lengths, verticals, horizontals)
-        lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_command, lengths, verticals, translation)
+
+        for i in range(len(correction_commands)):
+            lengths = BeatCorrecter.correction_accounting_for_different_divisions(correction_commands[i],
+                                                                                  lengths,
+                                                                                  verticals,
+                                                                                  translations[i])
         return lengths
 
 class BeatCorrecter():
@@ -326,12 +336,12 @@ if __name__ == '__main__':
     # e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
 
     e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
-    e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
-    e4_translation = (570, 95)
+    e4_correction_commands = ["M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"]
+    e4_translation = [(570, 95)]
     e4_answer = [0.16666666666666666, 0.16666666666666666, 0.16666666666666666, 0.5, 0.5, 0.5, 0.5, 0.5]
 
     s = PathCommandParser()
-    skj = s.path_command_to_beats(e4, e4_correction_command, e4_translation)
+    skj = s.path_command_to_beats(e4, e4_correction_commands, e4_translation)
     print(
         skj,
         "\n",

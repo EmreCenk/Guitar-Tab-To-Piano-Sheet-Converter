@@ -140,19 +140,19 @@ class SongScraper:
 
     def get_line_timings(self, line):
         timings = line.find_elements(By.TAG_NAME, "path")[1:]
-        correction_command = " "
+        correction_commands = []
         for k in timings:
             if k.get_attribute("class") == "Bhq244":
-                correction_command = k.get_attribute("d")
-                break
+                correction_commands.append(k.get_attribute("d"))
 
-        translation_element = line.find_elements(By.CLASS_NAME, "Bhq8x")
-        if len(translation_element) > 0:
-            translation_string = translation_element[0].get_attribute("transform")
+        translations = []
+
+        for element in line.find_elements(By.CLASS_NAME, "Bhq8x"):
+
+            translation_string = element.get_attribute("transform")
             translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
             translation = (float(translation_string[0]), float(translation_string[1]))
-        else:
-            translation = (0, 0)
+            translations.append(translation)
 
 
 
@@ -164,7 +164,9 @@ class SongScraper:
                 path_command = k.get_attribute("d")
                 parser = PathCommandParser()
                 # print(path_command)
-                beat_lengths = parser.path_command_to_beats(path_command, correction_command=correction_command, translation = translation)
+                beat_lengths = parser.path_command_to_beats(path_command,
+                                                            correction_commands=correction_commands,
+                                                            translations = translations)
                 for b in beat_lengths: times.append(b)
 
 
@@ -256,7 +258,7 @@ if __name__ == '__main__':
     url1 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139"
     url2 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139t1" #note: has issue on line 25 (with 0-indexing)
     self = SongScraper()
-    linelim = 24
+    linelim = 12
     tempo_bpm = 140
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
