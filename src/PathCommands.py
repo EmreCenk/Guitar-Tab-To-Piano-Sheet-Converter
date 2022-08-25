@@ -247,8 +247,39 @@ class BeatCorrecter():
             maxY = max(maxY, translated_y)
             minY = min(minY, translated_y)
         return minY, maxY
+
     @staticmethod
+
     def correction_accounting_for_different_divisions(correction_command: str,
+                                                      already_existing_beat: List[float],
+                                                      verticals: List[float],
+                                                      translation: Tuple[float, float],
+                                                      ) -> List[float]:
+
+
+        commands = PathCommandParser().convert_string_to_command_list(correction_command) #gets list of commands
+        l, r = BeatCorrecter.get_min_and_max_of_cmd(commands, translation) #gets leftmost and rightmost coordinatse
+
+
+        for i in range(len(verticals)):
+
+            if l <= verticals[i] <= r:
+                # correct verticals[i]
+                # marked.add(i)
+                # exponent = log2(1/verticals[i]) #how many times we divided
+                already_existing_beat[i] *= (2/3)**1
+                # todo: the 2/3 is like a placeholder until I see a 1/32th note that has these correction command things.
+                #  for now, no song appears to have them in weird note timings so this 2/3 coefficient does the trick
+
+
+
+        return already_existing_beat
+
+
+
+
+    @staticmethod
+    def legacy_bad_correction_accounting_for_different_divisions(correction_command: str,
                                                       already_existing_beat: List[float],
                                                       verticals: List[float],
                                                       translation: Tuple[float, float],
