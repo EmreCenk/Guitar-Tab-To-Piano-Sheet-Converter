@@ -11,7 +11,7 @@ class MIDICreator(MIDIFile):
         self.addTempo(self.current_track, 0, tempo_bmp)
 
     def add_note(self, note_number: int, starting_time: float, duration: float, volume: int = 100, track_num: int = 0):
-        self.addNote(track_num, 0, note_number, starting_time, duration, volume)
+        self.addNote(track_num, track_num, note_number, starting_time, duration, volume)
 
     def save(self, save_name: str):
         if save_name[:4] != ".mid": save_name += ".mid"

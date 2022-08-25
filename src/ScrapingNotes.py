@@ -140,19 +140,19 @@ class SongScraper:
 
     def get_line_timings(self, line):
         timings = line.find_elements(By.TAG_NAME, "path")[1:]
-        correction_command = " "
+        correction_commands = []
         for k in timings:
             if k.get_attribute("class") == "Bhq244":
-                correction_command = k.get_attribute("d")
-                break
+                correction_commands.append(k.get_attribute("d"))
 
-        translation_element = line.find_elements(By.CLASS_NAME, "Bhq8x")
-        if len(translation_element) > 0:
-            translation_string = translation_element[0].get_attribute("transform")
+        translations = []
+
+        for element in line.find_elements(By.CLASS_NAME, "Bhq8x"):
+
+            translation_string = element.get_attribute("transform")
             translation_string = translation_string[translation_string.find("(") + 1: translation_string.find(")")].split(",")
             translation = (float(translation_string[0]), float(translation_string[1]))
-        else:
-            translation = (0, 0)
+            translations.append(translation)
 
 
 
@@ -164,7 +164,9 @@ class SongScraper:
                 path_command = k.get_attribute("d")
                 parser = PathCommandParser()
                 # print(path_command)
-                beat_lengths = parser.path_command_to_beats(path_command, correction_command=correction_command, translation = translation)
+                beat_lengths = parser.path_command_to_beats(path_command,
+                                                            correction_commands=correction_commands,
+                                                            translations = translations)
                 for b in beat_lengths: times.append(b)
 
 
@@ -254,27 +256,29 @@ if __name__ == '__main__':
 
     # Sun Eater - Lorna Shore
     url1 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139"
-    url2 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139t1"
+    url2 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139t1" #note: has issue on line 25 (with 0-indexing)
     self = SongScraper()
-    linelim = 10
-    tempo_bpm = 90
+    linelim = 12
+    tempo_bpm = 140
     p1 = self.get_piece(url1, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     p2 = self.get_piece(url2, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3 = self.get_piece(url3, line_limit = linelim, tempo_bpm = tempo_bpm) #get first 12 lines
     # p3.tempo_bpm = 45
     # p1.convert_to_midi_file().save("p1")
-    print("done")
+    # print("done")
+
+    p2.volume_percentage = 0.8 #the left hand being slightly quieter makes this piece better in my opinion
     convert_multiple_pieces_to_midi([
                                      p1,
                                      p2,
                                      # p3
-                                     ], "second_song_tried")
+                                     ], "Sun Eater final")
 
     #fml
 
     self.browser.close()
-    p2.save_as_midi("p2")
-    p1.save_as_midi("p1")
+    p2.save_as_midi("Sun Eater Tab 2")
+    p1.save_as_midi("Sun Eater Tab 1")
     # midi_file1 = p1.convert_to_midi_file()
     # midi_file1.save("yes0")
     # midi_file2 = p2.convert_to_midi_file(midi_file1)

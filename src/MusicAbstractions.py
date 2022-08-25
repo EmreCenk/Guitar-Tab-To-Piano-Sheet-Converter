@@ -1,10 +1,11 @@
 from typing import *
 from src.midi import MIDICreator
 class PianoNote:
-    def __init__(self, beat_length: int, note: int, coordinate: Tuple[float, float] = (0, 0)):
+    def __init__(self, beat_length: int, note: int, coordinate: Tuple[float, float] = (0, 0), volume: int = 100):
         """
         :param beat_length: How long the note lasts for
         :param note: which note to play (a note of -1 indicates a rest)
+        :param volume: an integer from 0-127 that signifies how loud the note should be
 
         Note: Mapping notes to beat lengths is shown below:
         Whole note -> 4
@@ -17,6 +18,7 @@ class PianoNote:
         self.beat_length = beat_length
         self.note = note
         self.coordinate = coordinate
+        self.volume = volume
 
 class GuitarTabNote:
     def __init__(self, beat_length: int, guitar_fret_number: int, guitar_string_index: int):
@@ -58,9 +60,10 @@ class Bar:
         return notes
 
 class Piece:
-    def __init__(self, bars: List[Bar], tempo_bpm: int = 60):
+    def __init__(self, bars: List[Bar], tempo_bpm: int = 60, volume_percentage: float = 1):
         self.bars = bars
         self.tempo_bpm = tempo_bpm
+        self.volume_percentage = volume_percentage
         # self.time_signature = ...
         # todo: finding time signature and simplifying it is not as easy as it seems (i'm not even sure if time signature will be usefull at any point in time anyways)
 

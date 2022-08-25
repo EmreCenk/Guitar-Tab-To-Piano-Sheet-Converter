@@ -59,7 +59,11 @@ def convert_multiple_pieces_to_midi(pieces: List[Piece], file_name_to_save: str)
                     if n.note == -1:
                         time_displacement_due_to_rests += n.beat_length
                     else:
-                        midi.add_note(n.note + 20, current_time + time_displacement_due_to_rests, n.beat_length, track_num=j) #the +20 is there to convert the piano number to midi number
+                        midi.add_note(n.note + 20, current_time + time_displacement_due_to_rests,
+                                      n.beat_length,
+                                      track_num=j,
+                                      volume=round(pieces[j].volume_percentage * n.volume)
+                                      ) #the +20 is there to convert the piano number to midi number
                 current_time += a[0].beat_length
     midi.save(file_name_to_save)
     return midi
