@@ -172,7 +172,6 @@ class PathCommandParser:
 
     def path_command_to_beats(self, command: str,
                               correction_command: str = "",
-                              correction_coefficient: int = 2,
                               translation: Tuple[float, float] = (0, 0)) -> List[float]:
         """
         Converts a path command to a list of beat lengths.
@@ -293,10 +292,20 @@ if __name__ == '__main__':
     # example_path_command="M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
     # example_path_command = "M427,74v18M462,74v18M427,85v2h35v-2zM497,74v18M427,90v2h70v-2zM541,74v18M585,74v18M629,74v18M673,74v18M541,90v2h132v-2z"
     # e2 = "M106,74v18M150,74v18M185,74v18M106,90v2h79v-2zM150,85v2h35v-2zM220,74v18M255,74v18M220,90v2h35v-2zM220,85v2h35v-2zM289,74v18M351,74v18M351,90v2h7v-2z"
-    e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
+    # e3 = "M31,74v18M76,74v18M121,74v18M31,90v2h90v-2zM166,74v18M170,90v2h2v-2z" #test case with dots next to note beats, output should be [0.5, 0.5, 0.5, 1.5]
 
-    # e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
-    # e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
+    e4 = "M570,74v18M598,74v18M626,74v18M570,85v2h56v-2zM654,74v18M570,90v2h84v-2zM693,74v18M732,74v18M771,74v18M809,74v18M693,90v2h116v-2z" # should be [0.25, 0.25
+    e4_correction_command = "M 0,0 L 0,6 23,6 M 33,6 L 56,6 56,0"
+    e4_translation = (570, 95)
+    e4_answer = [0.16666666666666666, 0.16666666666666666, 0.16666666666666666, 0.5, 0.5, 0.5, 0.5, 0.5]
+
+    s = PathCommandParser()
+    skj = s.path_command_to_beats(e4, e4_correction_command, e4_translation)
+    print(
+        skj,
+        "\n",
+        e4_answer == skj
+    )
 
     # s4 = "M316,74v18M352,74v18M316,90v2h36v-2zM388,83v9M462,74v18"
 
@@ -305,9 +314,8 @@ if __name__ == '__main__':
 
     #gave error at some point for some reason: (should give 3 verticals):
     # e6 = "M99,74v18M156,74v18M213,74v18"
-    s = PathCommandParser()
     # for c in s.convert_string_to_command_list(e6): print(c)
-    print(s.path_command_to_beats(e3))
+    # print(s.path_command_to_beats(e3))
     # commands = s.convert_string_to_command_list(e5)
     # print(BeatCorrecter.get_min_and_max_of_cmd(commands, translation = (0, 0)))
     # print(BeatCorrecter.get_min_and_max_y(commands, translation = (0, 0)))
