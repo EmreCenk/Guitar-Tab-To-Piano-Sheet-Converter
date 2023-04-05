@@ -6,8 +6,8 @@ Also generates midi piano files for guitar tabs.
 As a piano player who loves listening to metal, certain songs only had guitar tabs, but no piano sheets music. <br> 
 So what I'm saying is yes, the whole project happened because I wanted to play Blind Guardian on the piano 
 
-## Example Results
-### Skalds and Shadows
+## Results
+### Example Sheet Music
 Piano sheet music generated automatically via an algorithm to process guitar tabs:
 
 <td>
@@ -26,11 +26,10 @@ Piano sheet music generated automatically via an algorithm to process guitar tab
    </tr> 
 </table>
 
-[Click here to see full pdf](/media/sheet_music_results/Skalds%20and%20Shadows%20PIano%20Sheet%20Music.pdf)
+[Click here to see full piano sheet pdf](/media/sheet_music_results/Skalds%20and%20Shadows%20PIano%20Sheet%20Music.pdf)
 
-### Sun Eater 
-Guitar tabs: https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139 <br>
-Resulting Piano Midi File:
+### Example Visualized Midi 
+![](https://www.youtube.com/watch?v=XBCvDiO-7Nw)
 
 
 
