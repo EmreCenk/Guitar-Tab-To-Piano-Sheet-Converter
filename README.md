@@ -28,9 +28,9 @@ Piano sheet music generated automatically via an algorithm to process guitar tab
 
 [Click here to see full piano sheet pdf](/media/sheet_music_results/Skalds%20and%20Shadows%20PIano%20Sheet%20Music.pdf)
 
-### Example Visualized Midi 
-<video src="https://www.youtube.com/watch?v=XBCvDiO-7Nw
-" width="100%"/>
+### Example Visualized Midi [click on image to play video]
+[![Watch the video](https://img.youtube.com/vi/XBCvDiO-7Nw/maxresdefault.jpg)](https://youtu.be/XBCvDiO-7Nw)
+[Click here or the image to open video](https://youtu.be/XBCvDiO-7Nw)
 
 
 ## How to Run
