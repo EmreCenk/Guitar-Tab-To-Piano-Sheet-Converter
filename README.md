@@ -34,4 +34,31 @@ Piano sheet music generated automatically via an algorithm to process guitar tab
 
 
 ## How to Run
-something
+
+```python
+from src.midi_utils import convert_multiple_pieces_to_midi
+url1 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139"
+url2 = "https://www.songsterr.com/a/wsa/lorna-shore-sun-eater-tab-s510139t1" 
+self = SongScraper()
+
+#reading the notes from the songsterr url:
+p1 = self.get_piece(url1, line_limit = 12, tempo_bpm = 140) # get first 12 lines at 140 bpm
+p2 = self.get_piece(url2, line_limit = 12, tempo_bpm = 140) # get first 12 lines at 140 bpm
+
+#cleaning up the web scraping:
+self.browser.close()
+
+# adjusting volume for a given piece:
+p2.volume_percentage = 0.8 #the left hand being slightly quieter makes this piece better in my opinion
+
+# merging multiple midi files and saving them into a single midi file titled "Sun Eater final"
+convert_multiple_pieces_to_midi([p1, p2], "Sun Eater final")
+
+# saving the individual midi files as well:
+p2.save_as_midi("Sun Eater Tab 2")
+p1.save_as_midi("Sun Eater Tab 1")
+
+# Once you have the midi files generated, you can basically do anything you want with the song
+# (sheet music, visualizing, etc. all accept midi as input so the possibilites are endless)
+
+```
